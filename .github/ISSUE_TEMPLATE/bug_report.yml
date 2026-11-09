@@ -1,0 +1,62 @@
+name: Bug report
+description: Something is wrong, wrong-looking, or crashes
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping. **Please do not paste anything private.** A PC EXPOSED report is a safe summary, but check it before sharing.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did you see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open the app\n2. Click EXPOSE MY PC\n3. ..."
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: PC EXPOSED version
+      description: Settings → About
+      placeholder: 0.1.0-beta.1
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and build
+      placeholder: "Windows 11 24H2 (build 26100)"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Scanning / hardware detection (a value is wrong or missing)
+        - Score / personality / roast
+        - Share cards (text clipped, layout, export)
+        - Compare / reports / import
+        - Settings / privacy
+        - Installer / startup / crash
+        - Accessibility
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Hardware (if relevant)
+      description: For a wrong or "Unavailable" reading, the exact CPU/GPU/drive model helps. Laptops, HDDs and Windows 10 are especially valuable to hear about.
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or exported report (optional)
+      description: Use Privacy mode / "Hide exact models" if you prefer not to share exact hardware.

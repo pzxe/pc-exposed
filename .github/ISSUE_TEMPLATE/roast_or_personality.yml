@@ -1,0 +1,20 @@
+name: Roast or personality suggestion
+description: Propose a funny line or a new PC personality
+labels: [content]
+body:
+  - type: markdown
+    attributes:
+      value: Roast the PC, never the person. Lines must be short, original, and tied to something the scan really finds.
+  - type: textarea
+    id: line
+    attributes:
+      label: The line (or personality name + description)
+    validations:
+      required: true
+  - type: input
+    id: condition
+    attributes:
+      label: What scan fact makes it true?
+      placeholder: "e.g. 20+ startup entries, an integrated GPU, an HDD system drive"
+    validations:
+      required: true

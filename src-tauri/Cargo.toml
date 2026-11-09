@@ -1,0 +1,31 @@
+[package]
+name = "pc-exposed"
+version = "0.1.0-beta.1"
+description = "Expose your PC. Discover its personality, uncover its secrets, and roast your hardware."
+edition = "2021"
+license = "MIT"
+rust-version = "1.77"
+
+[lib]
+name = "pc_exposed_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sysinfo = "0.36.1"
+wmi = "0.18.4"
+winreg = "0.56.0"
+windows = { version = "0.61.3", features = ["Win32_Graphics_Dxgi", "Win32_Graphics_Dxgi_Common", "Win32_System_Power", "Win32_Foundation", "Win32_Storage_FileSystem"] }
+tauri-plugin-dialog = "2"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

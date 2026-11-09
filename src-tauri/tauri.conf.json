@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "PC EXPOSED",
+  "version": "0.1.0-beta.1",
+  "identifier": "dev.pcexposed.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "PC EXPOSED",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 1000,
+        "minHeight": 680,
+        "decorations": false,
+        "center": true,
+        "resizable": true,
+        "backgroundColor": "#111014"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'; worker-src 'none'; manifest-src 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "license": "../LICENSE",
+    "shortDescription": "Expose your PC. Discover its personality and roast your hardware.",
+    "publisher": "PC EXPOSED contributors",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false,
+        "languages": [
+          "English"
+        ]
+      },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      }
+    },
+    "category": "Utility",
+    "copyright": "Copyright (c) 2026 PC EXPOSED contributors. MIT License.",
+    "longDescription": "PC EXPOSED investigates your PC locally and read-only, scores it with explainable evidence-based rules, assigns a personality, writes a roast, and exports shareable image cards. Nothing is uploaded."
+  }
+}
