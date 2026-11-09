@@ -42,8 +42,9 @@ const identity: Draw = (P, L, d, ic) => {
     P.roundRect({ x: pad, y: y0, w, h: rh * 3 + 28 }, 28, C.surface, C.border);
     rows.forEach(([k, v], i) => {
       const y = y0 + 14 + i * rh;
-      P.text(k.toUpperCase(), { x: pad + 28, y: y + 18, w: 190, h: 28 }, { size: 20, weight: 700, color: C.muted, spacing: 3 });
-      P.text(v, { x: pad + 240, y: y + 10, w: w - 240 - 28, h: 50 }, { size: 32, min: 20, weight: 600, family: "display", color: C.ink });
+      // Label column has slack for wider fallback fonts (Segoe UI is not on every system the renderer may run on).
+      P.text(k.toUpperCase(), { x: pad + 28, y: y + 18, w: 250, h: 28 }, { size: 20, weight: 700, color: C.muted, spacing: 3 });
+      P.text(v, { x: pad + 292, y: y + 10, w: w - 292 - 28, h: 50 }, { size: 32, min: 20, weight: 600, family: "display", color: C.ink });
     });
   } else {
     const lw = 1000;
@@ -200,7 +201,8 @@ function drawScoreTile(P: Painter, b: Box, d: CardData) {
   P.roundRect(b, 28, C.surface, C.border, 2);
   P.text("SCORE", { x: b.x + 28, y: b.y + 24, w: b.w - 56, h: 28 }, { size: 20, weight: 700, color: C.muted, spacing: 3 });
   const r = Math.min(b.w, b.h - 40) / 2 - 30;
-  P.ring(b.x + b.w / 2, b.y + b.h / 2 + 18, r, d.score, 16, { big: Math.round(r * 0.8), small: 12 });
+  // small: 0 hides the "OUT OF 100" caption: the tile is already labelled SCORE and the ring is too small for it.
+  P.ring(b.x + b.w / 2, b.y + b.h / 2 + 18, r, d.score, 16, { big: Math.round(r * 0.8), small: 0 });
 }
 
 const DRAW: Record<TemplateId, Draw> = { identity, roast, hardware, score, wrapped };

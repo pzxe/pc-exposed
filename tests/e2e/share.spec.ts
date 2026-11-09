@@ -193,3 +193,42 @@ test("the render audit itself works: it reports overlap, overflow and truncation
   expect(r.trunc.truncated).toHaveLength(1);
   expect(r.guard.overflows[0]).toMatch(/extends past content bottom/);
 });
+
+test("no card text clips even with a much wider font than Segoe UI (fallback-font robustness)", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto("/?demo=1");
+  await page.waitForSelector("text=Expose your PC");
+  const problems = await page.evaluate(async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const load = (path: string): Promise<any> => import(/* @vite-ignore */ path);
+    const [{ renderCard }, { buildCardData }, { analyze }, { makeScan }, { TEMPLATES }, { typography }, { drawCompareCard }, { buildReport }] = await Promise.all([
+      load("/src/share/render.ts"), load("/src/share/cardData.ts"), load("/src/engine/analyze.ts"), load("/src/engine/testFixtures.ts"),
+      load("/src/share/templates.ts"), load("/src/share/painter.ts"), load("/src/share/compareCard.ts"), load("/src/reports/format.ts"),
+    ]);
+    const out: string[] = [];
+    const canvas = document.createElement("canvas");
+    const spec = { rgb: ["Corsair iCUE"], launchers: ["Steam"], startupEnabled: 12, startupDisabled: 6, drives: [{ mount: "C:\\", totalGb: 1000, freeGb: 400, kind: "ssd", system: true }, { mount: "D:\\", totalGb: 2000, freeGb: 900, kind: "ssd" }] };
+    for (const family of ["Verdana, sans-serif", "Georgia, serif", "'Courier New', monospace"]) {
+      typography.override = family;
+      try {
+        const a = analyze(makeScan(spec), { seed: 3 });
+        for (const privacy of [false, true]) {
+          const data = buildCardData(a, { username: "@PCFlexer", privacy, watermark: true }, false);
+          for (const t of TEMPLATES) for (const f of ["portrait", "landscape"]) {
+            const r = await renderCard(canvas, t.id, f, data);
+            for (const k of ["overflows", "truncated", "overlaps"] as const) if (r[k].length) out.push(`[${family}] ${t.id}-${f}${privacy ? "-privacy" : ""} ${k}: ${r[k].join(" | ")}`);
+          }
+        }
+        const mk = (s2: object, label: string) => buildReport(analyze(makeScan(s2), { seed: 1 }), { label });
+        for (const f of ["portrait", "landscape"]) {
+          const r = drawCompareCard(canvas, f, mk(spec, "Gaming rig"), mk({ ...spec, threads: 8, gpu: "NVIDIA GeForce GTX 1660 SUPER", ramGb: 16 }, "Old faithful"), { privacy: false, watermark: true });
+          for (const k of ["overflows", "truncated", "overlaps"] as const) if (r.report[k].length) out.push(`[${family}] compare-${f} ${k}: ${r.report[k].join(" | ")}`);
+        }
+      } finally {
+        typography.override = null;
+      }
+    }
+    return out;
+  });
+  expect(problems, problems.join("\n")).toEqual([]);
+});

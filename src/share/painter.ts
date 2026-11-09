@@ -5,6 +5,12 @@ export const C = {
   accent: "#A879FF", soft: "#F1DDFE", muted: "#A89BB5", ink: "#F6EFFC", warn: "#F3C969",
 } as const;
 
+/**
+ * Test hook: forces one font family everywhere. The render audit uses it to prove that no text clips
+ * even with a much wider font than Segoe UI (which is what a system without Segoe UI would fall back to).
+ */
+export const typography: { override: string | null } = { override: null };
+
 const FAMILY = {
   display: '"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif',
   sans: '"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif',
@@ -52,7 +58,7 @@ export class Painter {
   layout(str: string, box: Box, s: TextStyle): { size: number; lines: string[]; blockH: number; truncated: boolean } {
     const { ctx } = this;
     const weight = s.weight ?? 500;
-    const family = FAMILY[s.family ?? "sans"];
+    const family = typography.override ?? FAMILY[s.family ?? "sans"];
     const lh = s.lineHeight ?? 1.22;
     ctx.save();
     ctx.letterSpacing = `${s.spacing ?? 0}px`;
@@ -69,7 +75,7 @@ export class Painter {
   text(str: string, box: Box, s: TextStyle): number {
     const { ctx } = this;
     const weight = s.weight ?? 500;
-    const family = FAMILY[s.family ?? "sans"];
+    const family = typography.override ?? FAMILY[s.family ?? "sans"];
     const lh = s.lineHeight ?? 1.22;
     const fit = this.layout(str, box, s);
     ctx.save();
@@ -129,7 +135,7 @@ export class Painter {
     const { ctx } = this;
     const size = Math.round(h * 0.46);
     ctx.save();
-    ctx.font = `600 ${size}px ${FAMILY.sans}`;
+    ctx.font = `600 ${size}px ${typography.override ?? FAMILY.sans}`;
     const w = Math.min(maxW, ctx.measureText(text).width + h * 0.9);
     ctx.restore();
     const px = align === "right" ? x - w : x;

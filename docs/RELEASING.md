@@ -12,7 +12,9 @@ Pre-release versions (anything with a `-`) are marked *pre-release* on GitHub au
    personality, uncover its secrets, and roast your hardware.*).
 2. Settings → Actions → General: allow workflows; "Read and write permissions" for `GITHUB_TOKEN`
    (the release workflow requests `contents: write` itself).
-3. Settings → Code security: enable *Private vulnerability reporting*, Dependabot alerts and updates.
+3. Settings → Code security: enable Dependabot alerts and updates. Enable *Private vulnerability reporting*
+   **at the moment the repository is made public**: GitHub does not offer it on private repositories (the API
+   returns 404), and `SECURITY.md` tells reporters to use it.
 4. Optional but recommended before a stable release: code-signing certificate (see below).
 
 ## Cutting a release
