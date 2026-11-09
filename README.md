@@ -65,7 +65,7 @@ these claims in [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md).
 **Requirements:** Windows 10 or 11, x64. The Microsoft WebView2 runtime (preinstalled on Windows 11; the
 installer fetches it on Windows 10 if missing).
 
-1. Download the installer (`PC EXPOSED_<version>_x64-setup.exe`) from this repository's **Releases** page.
+1. Download the installer (`PC.EXPOSED_<version>_x64-setup.exe`; GitHub shows spaces as dots) from this repository's **Releases** page.
 2. Optionally verify it against `SHA256SUMS.txt`:
    `Get-FileHash .\PC*setup.exe -Algorithm SHA256`
 3. Run it. It installs **per-user and needs no administrator rights** (to `%LOCALAPPDATA%\PC EXPOSED`), and adds

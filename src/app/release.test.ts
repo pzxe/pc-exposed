@@ -108,6 +108,17 @@ describe("workflows are safe by construction", () => {
     expect(rel).toContain("workflow_dispatch");
   });
 
+  it("checksum file names match the names GitHub serves (spaces become dots)", () => {
+    // Found by downloading the first draft release: the file said "PC EXPOSED_..." but GitHub serves "PC.EXPOSED_...".
+    expect(rel).toMatch(/\(\$_\.Name -replace ' ', '\.'\)/);
+  });
+
+  it("the checksum file is written with LF endings and no BOM, so `sha256sum -c` works on Linux/macOS", () => {
+    expect(rel).toContain("UTF8Encoding]::new($false)");
+    expect(rel).toMatch(/-join "`n"/);
+    expect(rel).not.toMatch(/Set-Content SHA256SUMS/); // Set-Content writes CRLF on Windows
+  });
+
   it("the release workflow checks the tag against the app version", () => {
     expect(rel).toMatch(/Tag \(\$TAG\) does not match/);
   });
