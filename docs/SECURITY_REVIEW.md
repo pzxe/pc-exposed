@@ -73,3 +73,19 @@ frozen). It was removed. Prototype pollution is instead addressed at the data bo
 - **Not independently audited**; no fuzzing of the Rust collectors beyond unit/integration tests.
 - **Installers are unsigned** until Checkpoint H/release; Windows SmartScreen will warn.
 - **WebView2 runtime** is a system component; its own security updates come from Windows/Edge.
+
+## v0.2.0-beta.1 delta review
+
+What changed in the attack surface, and why it is acceptable:
+
+- **No new permissions, commands or network code.** The CSP, `capabilities/default.json` and the Rust command
+  list are unchanged (guarded by `src/app/release.test.ts`); the static no-network scan covers the new files.
+- **New stored data: scan history** (`pc-exposed.history.v1`). Opt-in, off by default. It stores the same
+  `ReportV1` summary as a saved report (no process, startup-app or installed-app names; asserted by
+  `src/reports/history.test.ts`), capped at 60, and every entry is re-validated on read with the import
+  validator, so tampered storage is dropped rather than trusted. "Reset all local data" deletes it.
+- **Clipboard write (Copy specs).** User-initiated only; contains hardware facts and drive letters, no names
+  of apps, processes or adapters' addresses.
+- **Webview hardening.** In the installed app, reload shortcuts and the browser context menu are suppressed
+  (they could discard state and expose browser-only actions such as Print). Text fields keep their menu.
+- **Dependencies:** none added. `npm audit --omit=dev` and `cargo audit` results are recorded in the release PR.

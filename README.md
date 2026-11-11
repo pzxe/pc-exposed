@@ -6,7 +6,9 @@ PC EXPOSED is a free, open-source Windows desktop app. It investigates your PC *
 scores it with explainable, evidence-based rules, gives it a personality, writes a roast based on what it
 really found, and exports share-ready image cards. Nothing is uploaded. Ever.
 
-> **Beta (`v0.1.0-beta.1`).** Everything below works and is tested, but see [Known limitations](#known-limitations).
+> **Beta (`v0.2.0-beta.1`).** Everything below works and is tested, but see [Known limitations](#known-limitations).
+> New in this release: the **Glow-Up Plan**, opt-in **scan history**, and **Copy specs**
+> ([release notes](docs/releases/v0.2.0-beta.1.md)).
 
 ![Dashboard with last-scan summary](docs/screenshots/01-dashboard.png)
 
@@ -20,10 +22,20 @@ really found, and exports share-ready image cards. Nothing is uploaded. Ever.
 | 📊 **Scores honestly** | Six 0–100 scores (Hardware, Memory, Storage, Startup, Configuration, Gaming Readiness), each with reasons, a confidence level and a caveat. Missing data is *Unavailable*, never zero. |
 | 🧭 **Separates evidence** | Bottleneck findings are kept apart as *measured*, *potential*, *hardware pairing* and *insufficient evidence*. It never claims a benchmark it didn't run. |
 | 🎭 **Assigns a personality** | 12 personalities (THE GAMING MONSTER, THE SLEEPING GIANT, THE CHAOS ENGINE…) chosen from real findings, with the rule shown. |
+| 📈 **Glow-Up Plan** | Concrete fixes and upgrades ranked by how many points they would add, with steps. Projections re-run the same scoring rules, so they never disagree with your score. |
 | 🔥 **Roasts your PC** | 101 original, conditional lines. A Discord joke only appears if Discord really starts with Windows. No repeats. |
 | 🎁 **PC Wrapped** | A story-style recap of your PC. |
 | 🖼️ **Share cards** | 5 templates × 2 sizes (1080×1350, 1920×1080), live preview, **Privacy mode**, optional watermark, saved by you. |
 | ⚖️ **Compare PCs** | Save scans locally, import a friend's exported report, compare two systems, export a comparison card. |
+| 🕒 **History** (opt-in) | Off by default. When on, keeps a summary of each scan on this device and charts your score over time. |
+| 📋 **Copy specs** | A plain-text spec sheet for forum posts and "what should I upgrade?" threads. |
+
+### Glow-Up Plan and History
+
+<p>
+  <img src="docs/screenshots/10-glow-up-plan.png" width="49%" alt="Glow-Up Plan for a struggling laptop: free fixes and upgrades with projected scores">
+  <img src="docs/screenshots/11-history.png" width="49%" alt="Scan history with a score-over-time chart and changes between scans">
+</p>
 
 <p>
   <img src="docs/screenshots/02-results.png" width="49%" alt="Results with score ring and radar chart">
@@ -55,6 +67,7 @@ really found, and exports share-ready image cards. Nothing is uploaded. Ever.
 - The interface can do nothing but move and close the window. Saving a file goes through a validated native
   command, and **you** pick where it is written.
 - Imported report files are treated as hostile: validated against a whitelist, size- and range-limited, never executed.
+- Scan history is **off by default**; when on, it keeps only the report summary (no app or process names).
 - Delete everything it stores in **Settings → Local data**.
 
 Read exactly what a scan reads (and never reads) in [docs/PRIVACY.md](docs/PRIVACY.md), and the evidence behind
@@ -89,8 +102,9 @@ npm run tauri dev        # desktop app with hot reload
 npm run tauri build      # optimized app + installer in src-tauri/target/release/
 ```
 
-The browser-only preview (`npm run dev`, then add `?demo=1` to the URL) loads clearly labelled synthetic data;
-real scans need the desktop app.
+The browser-only preview (`npm run dev`, then add `?demo=1` to the URL, or `?demo=budget` for a struggling
+laptop) loads clearly labelled synthetic data; real scans need the desktop app. Regenerate the README
+screenshots and the per-release gallery in `docs/screenshots/updates/` with `$env:SCREENSHOTS=1; npm run screenshots`.
 
 ### Tests
 
@@ -124,7 +138,8 @@ clipping, truncation and overlap. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.m
 - Laptops, HDD systems and Windows 10 are covered by tests and fixtures but have had little real-hardware testing:
   please [open an issue](../../issues/new/choose) if a reading looks wrong.
 - Not yet tested with a real screen reader (NVDA/Narrator) or Windows High Contrast mode.
-- The app icon is a placeholder.
+- Glow-Up Plan projections show how the *score* would move, not frame rates or boot times. The Windows 11
+  suggestion does not check eligibility.
 - No MSI installer yet (the format rejects pre-release versions); the NSIS installer is provided.
 
 ## Contributing

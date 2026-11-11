@@ -35,7 +35,7 @@ mod tests {
     fn reports_package_version() {
         let info = build_app_info();
         assert_eq!(info.name, "PC EXPOSED");
-        assert_eq!(info.version, "0.1.0-beta.1");
+        assert_eq!(info.version, "0.2.0-beta.1");
         assert_eq!(info.license, "MIT");
     }
 

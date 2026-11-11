@@ -1,7 +1,7 @@
 {
   "name": "pc-exposed",
   "private": true,
-  "version": "0.1.0-beta.1",
+  "version": "0.2.0-beta.1",
   "type": "module",
   "license": "MIT",
   "description": "Expose your PC. Discover its personality, uncover its secrets, and roast your hardware.",
