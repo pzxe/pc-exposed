@@ -6,6 +6,7 @@
  */
 import { useSyncExternalStore } from "react";
 import { validateReport, type ReportV1 } from "./format";
+import { HISTORY_KEY, historyStore } from "./history";
 
 export type ReportSource = "local" | "imported";
 export interface StoredReport { report: ReportV1; source: ReportSource; savedAt: number }
@@ -14,7 +15,7 @@ export const REPORTS_KEY = "pc-exposed.reports.v1";
 export const MAX_REPORTS = 50;
 
 /** All localStorage keys this app owns. "Reset all local data" clears exactly these. */
-export const LOCAL_DATA_KEYS = [REPORTS_KEY, "pc-exposed.settings.v1", "pc-exposed.studio.v1", "pc-exposed.roasts.v1"] as const;
+export const LOCAL_DATA_KEYS = [REPORTS_KEY, HISTORY_KEY, "pc-exposed.settings.v1", "pc-exposed.studio.v1", "pc-exposed.roasts.v1"] as const;
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -85,6 +86,7 @@ export function clearAllLocalData(): void {
     try { localStorage.removeItem(k); } catch { /* unavailable */ }
   }
   reportStore.invalidate();
+  historyStore.invalidate();
 }
 
 export function useReports(): StoredReport[] {

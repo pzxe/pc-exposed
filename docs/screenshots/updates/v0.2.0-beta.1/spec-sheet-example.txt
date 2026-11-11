@@ -1,0 +1,8 @@
+CPU: Test CPU (8C/16T, 4.00 GHz)
+GPU: NVIDIA GeForce RTX 4080 (16 GB)
+RAM: 32 GB
+Storage: C: 1000 GB SSD (42% free), D: 2.0 TB SSD (45% free)
+OS: Windows 11 Pro 24H2 (build 26100.1)
+Form factor: desktop (no battery)
+
+Read locally with PC EXPOSED

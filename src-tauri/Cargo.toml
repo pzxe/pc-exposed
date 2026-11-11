@@ -1,6 +1,6 @@
 [package]
 name = "pc-exposed"
-version = "0.1.0-beta.1"
+version = "0.2.0-beta.1"
 description = "Expose your PC. Discover its personality, uncover its secrets, and roast your hardware."
 edition = "2021"
 license = "MIT"

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- PC EXPOSED app icon. Source for `npx tauri icon src-tauri/app-icon.svg`. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a2237"/>
+      <stop offset="1" stop-color="#111014"/>
+    </linearGradient>
+    <linearGradient id="lid" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f1ddfe"/>
+      <stop offset="1" stop-color="#a879ff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#a879ff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#a879ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bg)"/>
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="none" stroke="#3a2f4d" stroke-width="12"/>
+  <circle cx="512" cy="512" r="380" fill="url(#glow)"/>
+  <!-- eye -->
+  <path d="M152 512 C 272 300, 752 300, 872 512 C 752 724, 272 724, 152 512 Z" fill="#111014" stroke="url(#lid)" stroke-width="56" stroke-linejoin="round"/>
+  <circle cx="512" cy="512" r="150" fill="url(#lid)"/>
+  <circle cx="512" cy="512" r="66" fill="#111014"/>
+  <circle cx="566" cy="458" r="30" fill="#f6effc"/>
+</svg>

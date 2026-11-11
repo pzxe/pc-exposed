@@ -1,6 +1,6 @@
 # Privacy policy
 
-*Applies to PC EXPOSED v0.1.0-beta.1. Plain-language summary first, details below.*
+*Applies to PC EXPOSED v0.2.0-beta.1. Plain-language summary first, details below.*
 
 **PC EXPOSED investigates your PC on your PC. It never sends anything anywhere.**
 
@@ -8,7 +8,7 @@
 
 - No account. No telemetry. No analytics. No crash reporting. No automatic updates.
 - The app contains **no network-request code**. Its Content Security Policy blocks all external connections.
-- Scan results stay in memory until you save a report or export something.
+- Scan results stay in memory until you save a report, export something, or turn on scan history.
 - Anything leaving your device does so only because **you** chose a destination (a PNG or JSON file) and shared it yourself.
 - You can delete everything the app stores, at any time, in Settings → Local data.
 
@@ -42,6 +42,9 @@ Stored only in this app's own data folder, `%LOCALAPPDATA%\dev.pcexposed.desktop
 
 - **Saved reports** you chose to keep (a small summary: hardware classes and scores; no process
   or startup-app names). Up to 50.
+- **Scan history**, only if you turn it on (it is **off by default**): a summary of each real scan,
+  identical in content to a saved report (hardware classes and scores; no process, startup-app or
+  installed-app names). Up to 60, oldest dropped first. Delete one or all on the History screen.
 - **Roast history** (ids of roast lines already shown, to avoid repeats).
 - **Preferences**: animation setting, language, share-card options (including a username you typed).
 
@@ -54,6 +57,8 @@ Settings → Local data → Reset all local data *before* uninstalling, or delet
 
 - **PNG share cards.** Optional *Privacy mode* hides your username, exact CPU/GPU models, app
   names and drive letters. Cards made from demo data are labelled as such.
+- **Spec sheet (clipboard).** *Hardware → Copy specs* copies CPU, GPU, RAM, drive letters with sizes and
+  free space, Windows version and whether a battery is present. No app, process or network names.
 - **Report files (.json).** A summary as described in `docs/report-format.md`. The optional
   "Hide exact CPU/GPU models" setting replaces exact model names with generic classes.
 

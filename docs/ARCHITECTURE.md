@@ -18,7 +18,9 @@ src/
     personality.ts             12 personalities with explicit rules
     roast*.ts                  101 conditional roast lines + seeded selection
     wrapped.ts                 PC Wrapped data
-  reports/                     report format v1, validator, local store, comparison
+    advice.ts                  Glow-Up Plan: what-if actions re-scored with scoreFacts()
+  reports/                     report format v1, validator, local store, comparison,
+                               opt-in scan history (history.ts)
   share/                       canvas card renderer (painter, templates, compare card)
   i18n/                        message catalog, locale registry, plurals, RTL
   lib/                         typed Tauri bridge, settings, formatting, updates, contrast
@@ -31,6 +33,16 @@ docs/                          report format, security review, localization, acc
 `run_scan` (Rust, background thread per collector) → `ScanReport` JSON (typed, versioned,
 every metric a `Reading<T>` = available | unavailable-with-reason) → `analyze()` →
 `Analysis` → screens, share cards, Wrapped, saved/exported `ReportV1` summaries.
+
+Glow-Up Plan: `buildPlan(facts)` builds candidate actions, each a pure `Facts → Facts` change, and re-runs
+`scoreFacts()` (the same function `analyze()` uses) on the changed facts. A projection therefore cannot drift
+from the real scoring rules; a test asserts it for every action.
+
+Scan history (opt-in, `Settings.keepHistory`): after a real (non-demo) scan, `state.tsx` stores
+`buildReport(analysis, { now: scannedAtMs })` in `historyStore`, one entry per scan time, re-validated on
+every read with the same validator as imported files.
+
+The app version has one source: `package.json`, injected by Vite as `__APP_VERSION__` (`src/lib/version.ts`).
 
 ## Principles
 

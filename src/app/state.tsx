@@ -2,6 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { ScreenId } from "./nav";
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, type Settings } from "@/lib/settings";
 import { clearAllLocalData } from "@/reports/store";
+import { historyStore } from "@/reports/history";
+import { buildReport } from "@/reports/format";
 import { runScan } from "@/lib/tauri";
 import type { ScanReport } from "@/lib/scanTypes";
 import { analyze } from "@/engine/analyze";
@@ -77,8 +79,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // Dev-only: this branch is removed from production builds (import.meta.env.DEV is false there).
     if (import.meta.env.DEV) {
       const { makeScan } = await import("@/engine/testFixtures");
+      // ?demo=budget: a struggling budget laptop, used to show the Glow-Up Plan's full range in docs.
+      const budget = new URLSearchParams(location.search).get("demo") === "budget";
       setScan({
-        ...makeScan({
+        ...makeScan(budget ? {
+          threads: 8, cores: 4, gpu: "NVIDIA GeForce GTX 1650", vramGb: 4, ramGb: 8, ramUsedPct: 88, battery: true,
+          startupEnabled: ["Discord", "Steam", "Spotify", "OneDrive", "Teams", "Updater", "Sync", "Helper", "Agent", "Tray", "Launcher", "Cloud", "Notifier", "Widget",
+            "Adobe Updater", "Zoom", "Skype", "Dropbox", "Epic Games Launcher", "Battle.net", "Razer Synapse", "McAfee", "Java Update", "Cortana", "Edge Update", "Overwolf"],
+          startupDisabled: 2, launchers: ["Steam", "Epic Games Launcher", "Battle.net"], procs: ["chrome.exe", "Teams.exe", "Discord.exe"], apps: 240,
+          build: "19045.5011", uptimeDays: 23,
+          drives: [{ mount: "C:\\", totalGb: 476, freeGb: 41, kind: "hdd", system: true }],
+        } : {
           threads: 16, gpu: "NVIDIA GeForce RTX 4080", vramGb: 16, ramGb: 32, ramUsedPct: 52,
           startupEnabled: ["Discord", "Steam", "Spotify", "OneDrive", "Overwolf", "Updater", "Sync", "Helper", "Agent", "Tray", "Launcher", "Cloud", "Notifier", "Widget"], startupDisabled: 9,
           rgb: ["Corsair iCUE"], launchers: ["Steam", "Epic Games Launcher"], procs: ["chrome.exe", "Code.exe"],
@@ -121,6 +132,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [scan, round],
   );
+
+  // Opt-in scan history: record each REAL scan once (never the synthetic demo), as a privacy-safe summary.
+  useEffect(() => {
+    if (!settings.keepHistory || !scan || !analysis || demo) return;
+    if (historyStore.has(scan.scannedAtMs)) return;
+    historyStore.add(buildReport(analysis, { now: scan.scannedAtMs }));
+  }, [settings.keepHistory, scan, analysis, demo]);
 
   const reroll = useCallback(() => {
     if (!analysis) return;

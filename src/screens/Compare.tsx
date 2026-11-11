@@ -15,7 +15,7 @@ const CURRENT_ID = "current-scan";
 type Status = { kind: "ok" | "error"; text: string[] } | null;
 
 export function Compare() {
-  const { analysis, demo, go } = useApp();
+  const { analysis, scan, demo, go } = useApp();
   const stored = useReports();
   const [a, setA] = useState<string | null>(null);
   const [b, setB] = useState<string | null>(null);
@@ -52,21 +52,29 @@ export function Compare() {
   };
 
   const saveCurrent = () => {
-    if (!analysis) return;
-    const r = buildReport(analysis, { label: undefined });
+    if (!analysis || !scan) return;
+    // Dated by when the scan ran, not when Save was clicked; the same scan is only saved once.
+    if (stored.some((s) => s.source === "local" && s.report.createdAt === scan.scannedAtMs)) {
+      return setStatus({ kind: "ok", text: ["This scan is already saved on this device."] });
+    }
+    const r = buildReport(analysis, { now: scan.scannedAtMs });
     const res = reportStore.save(r, "local");
     setStatus(res.ok ? { kind: "ok", text: [`Saved “${r.label}” on this device.`] } : { kind: "error", text: [res.error] });
   };
 
   const importFile = async (file: File | undefined) => {
     if (!file) return;
-    if (file.size > MAX_REPORT_BYTES) return setStatus({ kind: "error", text: ["That file is larger than 1 MB, so it is not a PC EXPOSED report."] });
-    const parsed = parseReportFile(await file.text());
-    if (!parsed.ok) return setStatus({ kind: "error", text: ["Import rejected:", ...parsed.errors] });
-    // Always assign a fresh id so an import can never overwrite an existing report.
-    const res = reportStore.save({ ...parsed.report, id: newReportId() }, "imported");
-    setStatus(res.ok ? { kind: "ok", text: [`Imported “${parsed.report.label}”. It was validated and rebuilt from known fields only.`] } : { kind: "error", text: [res.error] });
-    if (fileInput.current) fileInput.current.value = "";
+    try {
+      if (file.size > MAX_REPORT_BYTES) return setStatus({ kind: "error", text: ["That file is larger than 1 MB, so it is not a PC EXPOSED report."] });
+      const parsed = parseReportFile(await file.text());
+      if (!parsed.ok) return setStatus({ kind: "error", text: ["Import rejected:", ...parsed.errors] });
+      // Always assign a fresh id so an import can never overwrite an existing report.
+      const res = reportStore.save({ ...parsed.report, id: newReportId() }, "imported");
+      setStatus(res.ok ? { kind: "ok", text: [`Imported “${parsed.report.label}”. It was validated and rebuilt from known fields only.`] } : { kind: "error", text: [res.error] });
+    } finally {
+      // Clear on every outcome, so picking the same file again (after fixing it) fires a new change event.
+      if (fileInput.current) fileInput.current.value = "";
+    }
   };
 
   const exportReport = async (r: ReportV1) => {

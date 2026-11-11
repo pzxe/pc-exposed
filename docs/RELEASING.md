@@ -24,6 +24,8 @@ Pre-release versions (anything with a `-`) are marked *pre-release* on GitHub au
    - `src-tauri/Cargo.toml` → `version` (then run `cargo check` so `Cargo.lock` follows)
    - `src-tauri/tauri.conf.json` → `version`
 2. **Update `CHANGELOG.md`**: rename `unreleased` to the release date and make sure it describes the changes.
+   Write `docs/releases/v<version>.md` (the GitHub release notes; a test requires it), and regenerate
+   screenshots into `docs/screenshots/updates/v<version>/` with `$env:SCREENSHOTS=1; npm run screenshots`.
 3. **Regenerate third-party licenses** if dependencies changed: `node scripts/generate-licenses.mjs`.
 4. **Run the full local checks** (`npm run typecheck`, `npm test`, `npm run test:e2e`, `cargo fmt --check`,
    `cargo clippy --all-targets -- -D warnings`, `cargo test`) and a local `npx tauri build`.
@@ -33,7 +35,7 @@ Pre-release versions (anything with a `-`) are marked *pre-release* on GitHub au
 8. The *Release* workflow verifies the tag equals the app version, runs the tests, builds the Windows x64
    installer (NSIS `.exe`), computes `SHA256SUMS.txt`, and attaches everything to a **draft** release.
 9. **Review the draft**: download the installer on a clean Windows machine/VM, check install, launch, a real
-   scan, saving a card, uninstall. Edit the release notes (copy from the changelog).
+   scan, saving a card, uninstall. Set the notes: `gh release edit v<version> --notes-file docs/releases/v<version>.md`.
 10. **Publish** the draft yourself.
 
 ## Verifying a build locally

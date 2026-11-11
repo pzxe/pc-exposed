@@ -32,9 +32,9 @@ export function buildDiscoveries(scan: ScanReport): Discovery[] {
 
   const gpus = valueOf(scan.gpus)?.filter((g) => !g.isSoftware);
   if (gpus && gpus.length) {
-    for (const g of gpus) {
+    for (const [i, g] of gpus.entries()) {
       const vram = valueOf(g.dedicatedVramBytes);
-      found(`gpu-${g.name}`, "Graphics", `${g.name}${vram ? ` · ${nominalVramGb(vram / GB)} GB VRAM` : ""}`);
+      found(`gpu-${i}-${g.name}`, "Graphics", `${g.name}${vram ? ` · ${nominalVramGb(vram / GB)} GB VRAM` : ""}`);
     }
   } else missing("gpu", "Graphics", scan.gpus.status === "unavailable" ? scan.gpus.reason : "no hardware graphics adapter reported");
 

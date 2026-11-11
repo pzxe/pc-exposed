@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { ChevronDown, PartyPopper } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronDown, ChevronRight, PartyPopper, TrendingUp } from "lucide-react";
+import { buildPlan } from "@/engine/advice";
 import { useApp } from "@/app/state";
 import { Button, NeedsScan, Panel, ScreenHeader } from "@/components/ui";
 import { lazy, Suspense } from "react";
@@ -11,6 +12,7 @@ import { iconFor } from "@/lib/icons";
 export function Results() {
   const { analysis, demo, go, setWrappedOpen } = useApp();
   const [open, setOpen] = useState<string | null>(null);
+  const plan = useMemo(() => (analysis ? buildPlan(analysis.facts) : null), [analysis]);
 
   if (!analysis) {
     return (
@@ -82,6 +84,14 @@ export function Results() {
             );
           })}
         </ul>
+        {plan && plan.allFree && (
+          <button type="button" onClick={() => go("plan")} data-testid="plan-teaser"
+            className="mt-4 flex w-full items-center gap-3 rounded-xl border border-accent/50 bg-surface-2/60 px-4 py-3 text-start text-sm hover:bg-surface-2">
+            <TrendingUp size={18} className="shrink-0 text-accent" aria-hidden />
+            <span className="flex-1">Free fixes could take this to <strong className="text-accent-soft">{plan.allFree.after}/100</strong> (+{plan.allFree.gain}). See your Glow-Up Plan.</span>
+            <ChevronRight size={16} className="text-muted rtl:rotate-180" aria-hidden />
+          </button>
+        )}
         {overall.reasons.some((r) => /excluded/.test(r.text)) && (
           <p className="mt-3 text-xs text-muted">{overall.reasons.find((r) => /excluded/.test(r.text))!.text}</p>
         )}

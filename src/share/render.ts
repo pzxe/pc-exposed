@@ -22,14 +22,20 @@ async function loadIcon(name: string, color: string): Promise<HTMLImageElement |
  * Draws a card onto `canvas` at its full export resolution.
  * The returned report lists any text that did not fit (must be empty).
  */
-export async function renderCard(canvas: HTMLCanvasElement, template: TemplateId, format: Format, data: CardData): Promise<RenderReport> {
+export async function renderCard(
+  canvas: HTMLCanvasElement, template: TemplateId, format: Format, data: CardData,
+  /** Checked after the async preparation. When it returns false the canvas is left untouched, so a slow,
+   *  superseded render can never paint over a newer one (fast template switching). */
+  isCurrent: () => boolean = () => true,
+): Promise<RenderReport | null> {
   const { w, h } = SIZES[format];
+  try { await document.fonts.ready; } catch { /* fonts API unavailable: system fallback is used */ }
+  const icon = await loadIcon(data.personality.icon, data.personality.color);
+  if (!isCurrent()) return null;
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D is not available");
-  try { await document.fonts.ready; } catch { /* fonts API unavailable: system fallback is used */ }
-  const icon = await loadIcon(data.personality.icon, data.personality.color);
   const P = new Painter(ctx, w, h);
   drawTemplate(P, template, data, icon);
   return P.report;

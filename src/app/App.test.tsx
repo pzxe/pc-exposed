@@ -8,10 +8,10 @@ import { parseSettings, DEFAULT_SETTINGS } from "@/lib/settings";
 beforeEach(() => localStorage.clear());
 
 describe("application shell", () => {
-  it("renders every required screen (the nine from the spec, plus Compare PCs) via navigation", () => {
+  it("renders every screen (the nine from the spec, Compare PCs, Glow-Up Plan and History) via navigation", () => {
     render(<App />);
     expect(NAV.map((n) => en[n.labelKey])).toEqual([
-      "Dashboard", "Investigation", "PC Exposure", "Personality", "Hardware", "System Analysis", "PC Roast", "Share Studio", "Compare PCs", "Settings",
+      "Dashboard", "Investigation", "PC Exposure", "Personality", "Hardware", "System Analysis", "Glow-Up Plan", "PC Roast", "Share Studio", "Compare PCs", "History", "Settings",
     ]);
     for (const item of NAV) {
       fireEvent.click(screen.getByRole("button", { name: en[item.labelKey] }));

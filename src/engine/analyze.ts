@@ -1,7 +1,6 @@
 import type { ScanReport } from "@/lib/scanTypes";
 import { extractFacts, type Facts } from "./facts";
-import { scoreConfig, scoreGaming, scoreHardware, scoreMemory, scoreOverall, scoreStartup, scoreStorage } from "./scoring";
-import { analyzeBottlenecks, BENCHMARK_NOTICE } from "./bottleneck";
+import { scoreConfig, scoreGaming, scoreHardware, scoreMemory, scoreOverall, scoreStartup, scoreStorage } from "./scoring";import { analyzeBottlenecks, BENCHMARK_NOTICE } from "./bottleneck";
 import { classifyPersonality } from "./personality";
 import { generateRoasts } from "./roast";
 import type { Analysis, CategoryScore } from "./types";
@@ -17,13 +16,18 @@ export interface AnalyzeOptions {
  * Entry point of the analysis engine: ScanReport in, Analysis out.
  * Pure and deterministic for a given (scan, seed, recentRoastIds).
  */
-export function analyze(scan: ScanReport, opts: AnalyzeOptions = {}): Analysis & { facts: Facts } {
-  const facts = extractFacts(scan);
+/** Scores a set of facts. Shared by `analyze` and the Glow-Up Plan's what-if projections, so both use identical rules. */
+export function scoreFacts(facts: Facts): { categories: CategoryScore[]; overall: Analysis["overall"] } {
   const categories: CategoryScore[] = [
     scoreHardware(facts), scoreMemory(facts), scoreStorage(facts),
     scoreStartup(facts), scoreConfig(facts), scoreGaming(facts),
   ];
-  const overall = scoreOverall(categories);
+  return { categories, overall: scoreOverall(categories) };
+}
+
+export function analyze(scan: ScanReport, opts: AnalyzeOptions = {}): Analysis & { facts: Facts } {
+  const facts = extractFacts(scan);
+  const { categories, overall } = scoreFacts(facts);
   const bottlenecks = analyzeBottlenecks(facts);
 
   const s: Partial<Record<CategoryScore["id"], number>> = {};

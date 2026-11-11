@@ -17,6 +17,8 @@ export interface HwClass {
 
 const LABELS = ["Integrated", "Entry", "Mainstream", "Upper-mid", "High-end", "Enthusiast"] as const;
 const mk = (tier: HwClass["tier"], basis: string): HwClass => ({ tier, label: LABELS[tier], basis });
+/** Builds a class for a given tier (used by what-if projections). */
+export const classForTier = mk;
 
 const t = (n: number): HwClass["tier"] => Math.max(0, Math.min(5, n)) as HwClass["tier"];
 
@@ -33,9 +35,10 @@ export function classifyGpu(name: string): HwClass | undefined {
     return mk(t(d >= 7 || (battlemage && d >= 5) ? 3 : d >= 5 ? 2 : 1), basis);
   }
 
-  // Integrated graphics
+  // Integrated graphics. Includes the names laptops actually report, e.g. "AMD Radeon(TM) 890M Graphics"
+  // and Intel's Lunar Lake / Arrow Lake "Intel(R) Arc(TM) 140V GPU" / "130T" (integrated despite the Arc brand).
   if (
-    /Intel\(R\)\s*(UHD|HD|Iris|Graphics)|Intel.*Graphics(?!.*Arc)|Radeon\(TM\)\s*Graphics|Radeon\s+\d{3}M\b|Vega\s+\d+\s+Graphics|Radeon\s+Graphics/i.test(n)
+    /Intel\(R\)\s*(UHD|HD|Iris|Graphics)|Intel.*Graphics(?!.*Arc)|Radeon\(TM\)\s*Graphics|Radeon(?:\(TM\))?\s+\d{3}M\b|Vega\s+\d+\s+Graphics|Radeon\s+Graphics|Intel.*Arc(?:\(TM\))?\s+\d{3}[VTH]\b/i.test(n)
   ) {
     return mk(0, "integrated graphics detected from the adapter name");
   }
