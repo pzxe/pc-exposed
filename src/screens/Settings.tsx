@@ -7,6 +7,7 @@ import type { MotionPref } from "@/lib/settings";
 import { listLocales, useI18n, type MessageKey } from "@/i18n";
 import { COLLECTED_SECTIONS, collectedKey, NEVER_COLLECTED } from "@/lib/privacyInfo";
 import { checkForUpdates, DEFAULT_UPDATE_PROVIDER } from "@/lib/updates";
+import { APP_VERSION } from "@/lib/version";
 
 const motionOptions: { value: MotionPref; key: MessageKey }[] = [
   { value: "system", key: "settings.motion.system" },
@@ -33,7 +34,7 @@ export function SettingsScreen() {
     getAppInfo().then(setInfo).catch(() => setInfo(null));
   }, []);
 
-  const version = info?.version ?? "0.1.0-beta.1";
+  const version = info?.version ?? APP_VERSION;
 
   return (
     <div className="animate-rise space-y-4">
@@ -91,6 +92,13 @@ export function SettingsScreen() {
           {t("settings.local.body")} <span data-testid="report-count-text">{tp("settings.local.count", reports.length)}</span>
           <span hidden data-testid="report-count">{reports.length}</span>
         </p>
+        <label className="mb-4 flex items-start gap-2 text-sm">
+          <input type="checkbox" checked={settings.keepHistory} onChange={(e) => updateSettings({ keepHistory: e.target.checked })} className="mt-1 accent-[#a879ff]" />
+          <span>
+            <span className="font-medium">{t("settings.local.history")}</span>
+            <span className="block text-xs text-muted">{t("settings.local.history.note")}</span>
+          </span>
+        </label>
         <div className="flex flex-wrap items-center gap-2">
           {confirm === null && (
             <>

@@ -12,6 +12,7 @@
 import type { FullAnalysis } from "@/app/state";
 import type { CategoryId } from "@/engine/types";
 import { genericCpu, vendorOf } from "@/share/cardData";
+import { APP_VERSION } from "@/lib/version";
 
 export const REPORT_FORMAT = "pc-exposed-report" as const;
 export const REPORT_VERSION = 1 as const;
@@ -77,7 +78,7 @@ export function buildReport(a: FullAnalysis, opts: { label?: string; now?: numbe
   const r: ReportV1 = {
     format: REPORT_FORMAT, formatVersion: REPORT_VERSION, id: newReportId(), createdAt: now,
     label: cleanText(opts.label ?? `${a.personality.primary.def.title} · ${new Date(now).toLocaleDateString()}`, 40) || "My PC",
-    appVersion: opts.appVersion ?? "0.1.0-beta.1",
+    appVersion: opts.appVersion ?? APP_VERSION,
     system: {
       cpu: f.cpuName !== undefined || f.logicalThreads !== undefined
         ? { name: f.cpuName, threads: f.logicalThreads, cores: f.physicalCores, maxClockGhz: f.maxClockGhz, tier: f.cpuClass?.tier } : undefined,

@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ScreenHeader } from "@/components/ui";
 import { I18nProvider, useI18n } from "@/i18n";
+import { inTauri } from "@/lib/tauri";
 import { Home } from "@/screens/Home";
 import { Hardware } from "@/screens/Hardware";
 import { SettingsScreen } from "@/screens/Settings";
@@ -16,6 +17,8 @@ import { Analysis } from "@/screens/Analysis";
 import { RoastScreen } from "@/screens/Roast";
 import { Wrapped } from "@/screens/Wrapped";
 import { Compare } from "@/screens/Compare";
+import { Plan } from "@/screens/Plan";
+import { HistoryScreen } from "@/screens/History";
 
 // The Studio pulls in the canvas/icon renderer, so it loads on demand.
 const ShareStudio = lazy(() => import("@/screens/ShareStudio").then((m) => ({ default: m.ShareStudio })));
@@ -27,6 +30,7 @@ const SCREENS: Record<ScreenId, () => ReactNode> = {
   personality: () => <Personality />,
   hardware: () => <Hardware />,
   analysis: () => <Analysis />,
+  plan: () => <Plan />,
   roast: () => <RoastScreen />,
   share: () => (
     <Suspense fallback={<ScreenHeader title="Share Card Studio" subtitle="Loading…" />}>
@@ -34,6 +38,7 @@ const SCREENS: Record<ScreenId, () => ReactNode> = {
     </Suspense>
   ),
   compare: () => <Compare />,
+  history: () => <HistoryScreen />,
   settings: () => <SettingsScreen />,
 };
 
@@ -45,6 +50,22 @@ function Shell() {
 
   // On navigation: update the window title and move focus to the new screen's heading so
   // keyboard and screen-reader users land at the top of the new content.
+  // In the installed app, a webview reload (F5, Ctrl+R) would silently discard the scan, and the default
+  // browser context menu (Back, Refresh, Print…) is meaningless here. Text fields keep their own menu.
+  useEffect(() => {
+    if (!inTauri() || import.meta.env.DEV) return;
+    const onKey = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase();
+      if (e.key === "F5" || ((e.ctrlKey || e.metaKey) && (k === "r" || k === "p"))) e.preventDefault();
+    };
+    const onMenu = (e: MouseEvent) => {
+      if (!(e.target instanceof HTMLElement && e.target.closest("input, textarea, [contenteditable='true']"))) e.preventDefault();
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("contextmenu", onMenu);
+    return () => { window.removeEventListener("keydown", onKey); window.removeEventListener("contextmenu", onMenu); };
+  }, []);
+
   useEffect(() => {
     const label = t(NAV.find((n) => n.id === screen)!.labelKey);
     document.title = `${label} · PC EXPOSED`;

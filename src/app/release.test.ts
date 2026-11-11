@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { compareVersions } from "@/lib/updates";
 
 /** Release-readiness guards: versions in sync, required repo files present, safe workflows, no permission creep. */
 const ROOT = resolve(__dirname, "../..");
@@ -17,9 +18,20 @@ describe("version consistency", () => {
     expect(new Set([pkg, tauri, cargo, lock]).size, JSON.stringify({ pkg, tauri, cargo, lock })).toBe(1);
   });
 
-  it("is a valid semantic version (the initial development version is 0.1.0-beta.1)", () => {
+  it("is a valid semantic version, never below the first public beta", () => {
     expect(pkg).toMatch(/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/);
-    expect(pkg).toBe("0.1.0-beta.1");
+    expect(compareVersions(pkg, "0.1.0-beta.1")).toBeGreaterThan(0);
+    expect(pkg).toBe("0.2.0-beta.1");
+  });
+
+  it("every released version keeps its changelog section (versions only go up)", () => {
+    const sections = [...read("CHANGELOG.md").matchAll(/^## \[([^\]]+)\]/gm)].map((m) => m[1]);
+    expect(sections[0]).toBe(pkg);
+    for (let i = 1; i < sections.length; i++) expect(compareVersions(sections[i - 1], sections[i]), sections.join(" > ")).toBeGreaterThan(0);
+  });
+
+  it("release notes exist for this version", () => {
+    expect(existsSync(join(ROOT, `docs/releases/v${pkg}.md`))).toBe(true);
   });
 
   it("the changelog has a section for this version", () => {

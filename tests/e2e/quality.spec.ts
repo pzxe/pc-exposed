@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { nav, seedHistory } from "./helpers";
 
 /**
  * Quality gates run against every screen, using the labelled dev-only demo data:
@@ -8,12 +9,12 @@ import AxeBuilder from "@axe-core/playwright";
  */
 const SCREENS = [
   "Dashboard", "Investigation", "PC Exposure", "Personality", "Hardware", "System Analysis",
-  "PC Roast", "Share Studio", "Compare PCs", "Settings",
+  "Glow-Up Plan", "PC Roast", "Share Studio", "Compare PCs", "History", "Settings",
 ];
 const SIZES = [{ width: 1000, height: 680 }, { width: 1280, height: 800 }, { width: 1920, height: 1080 }];
 
 async function open(page: Page, name: string) {
-  await page.getByRole("button", { name, exact: true }).click();
+  await nav(page, name);
   await page.waitForTimeout(450); // entrance animation
 }
 
@@ -35,6 +36,12 @@ test.describe("accessibility (axe-core, WCAG 2.1 AA)", () => {
         await page.waitForTimeout(400);
       }
       if (name === "PC Exposure") await page.getByRole("button", { name: /Startup Efficiency/ }).click();
+      if (name === "History") {
+        // Audit the populated screen (chart + list), not just the opt-in empty state.
+        await seedHistory(page);
+        await page.waitForSelector("[data-testid=history-list]");
+        await page.waitForTimeout(400);
+      }
       const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
       const summary = results.violations.map((v) => `${v.impact} ${v.id}: ${v.help} (${v.nodes.length}) e.g. ${v.nodes[0]?.target.join(" ")}`);
       expect(summary, summary.join("\n")).toEqual([]);

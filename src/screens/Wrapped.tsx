@@ -57,8 +57,10 @@ export function Wrapped() {
     const onKey = (e: KeyboardEvent) => {
       const rtl = document.documentElement.dir === "rtl";
       const next = rtl ? "ArrowLeft" : "ArrowRight", prev = rtl ? "ArrowRight" : "ArrowLeft";
+      // Space on a focused button already activates that button; advancing too would act twice.
+      const onButton = e.target instanceof HTMLElement && e.target.closest("button") !== null;
       if (e.key === "Escape") setWrappedOpen(false);
-      else if (e.key === next || e.key === " ") setI((n) => Math.min(n + 1, slides.length - 1));
+      else if (e.key === next || (e.key === " " && !onButton)) { if (e.key === " ") e.preventDefault(); setI((n) => Math.min(n + 1, slides.length - 1)); }
       else if (e.key === prev) setI((n) => Math.max(n - 1, 0));
       else if (e.key === "Tab" && dialog.current) {
         // Trap Tab inside the dialog (WCAG 2.4.3): cycle through its enabled buttons.

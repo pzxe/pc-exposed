@@ -7,7 +7,7 @@ describe("buildDiscoveries", () => {
     const d = buildDiscoveries(makeScan({ startupEnabled: 4, startupDisabled: 2, rgb: ["OpenRGB"], gpu: "NVIDIA GeForce RTX 4070", vramGb: 12 }));
     const by = Object.fromEntries(d.map((x) => [x.id, x]));
     expect(by.cpu.text).toContain("16 threads");
-    expect(by["gpu-NVIDIA GeForce RTX 4070"].text).toContain("12 GB VRAM");
+    expect(by["gpu-0-NVIDIA GeForce RTX 4070"].text).toContain("12 GB VRAM");
     expect(by.ram.text).toMatch(/^32 GB/);
     expect(by.startup.text).toBe("4 apps start with Windows (2 disabled)");
     expect(by.apps.text).toContain("spotted 1 gaming/peripheral suite");

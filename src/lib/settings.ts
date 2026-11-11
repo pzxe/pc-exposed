@@ -7,10 +7,12 @@ export interface Settings {
   motion: MotionPref;
   /** Locale id from the i18n registry (BCP 47 tag). */
   language: string;
+  /** Opt-in: keep a summary of each scan on this device to show progress over time. Off by default. */
+  keepHistory: boolean;
 }
 
 const KEY = "pc-exposed.settings.v1";
-export const DEFAULT_SETTINGS: Settings = { motion: "system", language: DEFAULT_LOCALE };
+export const DEFAULT_SETTINGS: Settings = { motion: "system", language: DEFAULT_LOCALE, keepHistory: false };
 
 /** Defensive parse: unknown or corrupt storage falls back to defaults. */
 export function parseSettings(raw: string | null): Settings {
@@ -19,7 +21,7 @@ export function parseSettings(raw: string | null): Settings {
     const v = JSON.parse(raw) as Partial<Settings>;
     const motion: MotionPref =
       v.motion === "on" || v.motion === "off" || v.motion === "system" ? v.motion : "system";
-    return { motion, language: isLocaleId(v.language) ? v.language : DEFAULT_LOCALE };
+    return { motion, language: isLocaleId(v.language) ? v.language : DEFAULT_LOCALE, keepHistory: v.keepHistory === true };
   } catch {
     return DEFAULT_SETTINGS;
   }

@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
-import { Cpu, RefreshCw } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { Check, ClipboardCopy, Cpu, RefreshCw } from "lucide-react";
+import { buildSpecSheet } from "@/lib/specSheet";
 import { useApp } from "@/app/state";
 import { Button, EmptyState, Panel, ScreenHeader } from "@/components/ui";
 import { formatBytes, formatUptime, reasonOf, show } from "@/lib/format";
@@ -34,14 +35,34 @@ function Failed({ r }: { r: Reading<unknown> }) {
 
 export function Hardware() {
   const { scan, scanning, scanError, startScan } = useApp();
+  const [copy, setCopy] = useState<"idle" | "done" | "failed">("idle");
+
+  const copySpecs = async () => {
+    if (!scan) return;
+    try {
+      await navigator.clipboard.writeText(buildSpecSheet(scan));
+      setCopy("done");
+    } catch {
+      setCopy("failed");
+    }
+    setTimeout(() => setCopy("idle"), 2000);
+  };
 
   const header = (
-    <div className="flex items-start justify-between">
+    <div className="flex items-start justify-between gap-4">
       <ScreenHeader title="Hardware Details" subtitle="Read-only measurements taken from this PC." />
-      <Button variant="ghost" onClick={startScan} disabled={scanning}>
-        <RefreshCw size={16} className={scanning ? "animate-spin" : ""} aria-hidden />
-        {scan ? "Rescan" : "Run scan"}
-      </Button>
+      <div className="flex shrink-0 gap-2">
+        {scan && (
+          <Button variant="ghost" onClick={() => void copySpecs()} title="Copies CPU, GPU, RAM, storage and Windows version as plain text, ready to paste into a forum or chat">
+            {copy === "done" ? <Check size={16} aria-hidden /> : <ClipboardCopy size={16} aria-hidden />}
+            {copy === "done" ? "Copied" : copy === "failed" ? "Copy unavailable" : "Copy specs"}
+          </Button>
+        )}
+        <Button variant="ghost" onClick={startScan} disabled={scanning}>
+          <RefreshCw size={16} className={scanning ? "animate-spin" : ""} aria-hidden />
+          {scan ? "Rescan" : "Run scan"}
+        </Button>
+      </div>
     </div>
   );
 
@@ -95,8 +116,8 @@ export function Hardware() {
         </Section>
 
         <Section title="Graphics">
-          {gpus.status === "available" ? gpus.value.map((g) => (
-            <dl key={g.name} className="mb-3 last:mb-0">
+          {gpus.status === "available" ? gpus.value.map((g, i) => (
+            <dl key={`${i}-${g.name}`} className="mb-3 last:mb-0">
               <Row label="Adapter" value={g.isSoftware ? `${g.name} (software)` : g.name} />
               <R label="Manufacturer" r={g.manufacturer} />
               <R label="Dedicated VRAM" r={g.dedicatedVramBytes} fmt={formatBytes} />
@@ -158,8 +179,8 @@ export function Hardware() {
                 <Row label="With size info" value={String(apps.value.appsWithSizeInfo)} />
               </dl>
               <ul className="mt-2 text-xs text-muted">
-                {apps.value.largest.slice(0, 5).map((a) => (
-                  <li key={a.name}>{a.name} — {formatBytes(a.sizeBytes ?? 0)}</li>
+                {apps.value.largest.slice(0, 5).map((a, i) => (
+                  <li key={`${i}-${a.name}`}>{a.name} — {formatBytes(a.sizeBytes ?? 0)}</li>
                 ))}
               </ul>
             </>
@@ -175,8 +196,8 @@ export function Hardware() {
           )}
           {network.status === "available" ? (
             <dl className="mt-2">
-              {network.value.map((n) => (
-                <Row key={n.name} label={n.name}
+              {network.value.map((n, i) => (
+                <Row key={`${i}-${n.name}`} label={n.name}
                   value={`${show(n.connected, (c) => (c ? "connected" : "disconnected"))}${n.speedBitsPerSec.status === "available" ? ` · ${(n.speedBitsPerSec.value / 1e6).toFixed(0)} Mbps` : ""}`} />
               ))}
             </dl>
@@ -188,7 +209,7 @@ export function Hardware() {
             <>
               <dl><Row label="Running" value={String(processes.value.totalCount)} /></dl>
               <ul className="mt-2 text-xs text-muted">
-                {processes.value.topByMemory.map((p) => <li key={p.name}>{p.name} — {formatBytes(p.memoryBytes)}</li>)}
+                {processes.value.topByMemory.map((p, i) => <li key={`${i}-${p.name}`}>{p.name} — {formatBytes(p.memoryBytes)}</li>)}
               </ul>
             </>
           ) : <Failed r={processes} />}

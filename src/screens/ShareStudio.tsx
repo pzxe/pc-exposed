@@ -46,7 +46,9 @@ export function ShareStudio() {
   useEffect(() => {
     if (!data || !canvas.current) return;
     let cancelled = false;
-    void renderCard(canvas.current, template, format, data).then((r) => { if (!cancelled) setReport(r); }).catch((e) => setStatus({ kind: "error", text: String(e) }));
+    void renderCard(canvas.current, template, format, data, () => !cancelled)
+      .then((r) => { if (r && !cancelled) setReport(r); })
+      .catch((e) => { if (!cancelled) setStatus({ kind: "error", text: String(e) }); });
     return () => { cancelled = true; };
   }, [data, template, format]);
 
